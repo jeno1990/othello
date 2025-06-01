@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
 import 'package:othello/controllers/game_state_controller.dart';
+import 'package:othello/controllers/sound_state_controller.dart';
 import 'package:othello/presentation/screens/home_page.dart';
 import 'package:othello/presentation/widgets/play_button.dart';
 
@@ -28,6 +29,12 @@ class _LandingPageState extends State<LandingPage> {
       await _audioPlayer.resume();
     });
   }
+
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   Get.routing.routeObserver.subscribe(this, ModalRoute.of(context)!);
+  // }
 
   @override
   void dispose() {
@@ -172,9 +179,23 @@ class _LandingPageState extends State<LandingPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                bottomSettings(Icons.settings),
+                bottomSettings(Icons.settings, () {}),
                 SizedBox(width: 20),
-                bottomSettings(Icons.volume_up),
+                GetBuilder<GameSoundContoller>(
+                  builder: (controller) {
+                    return bottomSettings(
+                      controller.isSoundOn ? Icons.volume_up : Icons.volume_off,
+                      () {
+                        if (controller.isSoundOn) {
+                          _audioPlayer.pause();
+                        } else {
+                          _audioPlayer.resume();
+                        }
+                        controller.setSound();
+                      },
+                    );
+                  },
+                ),
               ],
             ),
             SizedBox(height: 20),
@@ -220,10 +241,11 @@ class _LandingPageState extends State<LandingPage> {
     );
   }
 
-  IconButton bottomSettings(IconData icon) => IconButton(
-    onPressed: () {},
-    icon: Icon(icon, size: 40, color: Colors.white),
-    splashColor: Colors.white,
-    splashRadius: 5,
-  );
+  IconButton bottomSettings(IconData icon, VoidCallback onPressed) =>
+      IconButton(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 40, color: Colors.white),
+        splashColor: Colors.white,
+        splashRadius: 5,
+      );
 }

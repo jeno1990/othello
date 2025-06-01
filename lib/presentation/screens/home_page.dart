@@ -1,9 +1,12 @@
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:othello/game/board.dart';
 import 'package:othello/models/block_unit.dart';
 import 'package:othello/models/coordinate.dart';
+import 'package:othello/presentation/widgets/board_boarder_radius.dart';
+import 'package:othello/presentation/widgets/menu_tab.dart';
 import 'package:othello/utils/constants.dart';
 
 class GamePage extends StatefulWidget {
@@ -14,35 +17,18 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  final Board board = BoardImplementation();
-  late List<List<BlockUnit>> table;
+  late final AudioPlayer _audioPlayer;
+  late final Board board;
   int currentTurn = ITEM_BLACK;
   int countItemWhite = 0;
   int countItemBlack = 0;
 
   @override
   void initState() {
-    initTable();
-    initTableItems();
+    board = Board();
+    _audioPlayer = AudioPlayer();
+    _audioPlayer.setReleaseMode(ReleaseMode.stop);
     super.initState();
-  }
-
-  void initTable() {
-    table = [];
-    for (int row = 0; row < 8; row++) {
-      List<BlockUnit> list = [];
-      for (int col = 0; col < 8; col++) {
-        list.add(BlockUnit(value: ITEM_EMPTY));
-      }
-      table.add(list);
-    }
-  }
-
-  void initTableItems() {
-    table[3][3].value = ITEM_WHITE;
-    table[4][3].value = ITEM_BLACK;
-    table[3][4].value = ITEM_BLACK;
-    table[4][4].value = ITEM_WHITE;
   }
 
   int randomItem() {
@@ -54,18 +40,37 @@ class _GamePageState extends State<GamePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Color(0xff3A6098),
         body: Container(
-          color: Color(0xffecf0f1),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff3A6098),
+                Color.fromARGB(255, 47, 105, 163),
+                Color(0xff3A6098),
+              ],
+            ),
+          ),
           child: Column(
             children: <Widget>[
+              MenuTab(),
               buildMenu(),
               Expanded(
                 child: Center(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Color(0xff34495e),
+                      color: Colors.black54,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(width: 8, color: Color(0xff2c3e50)),
+                      border: Border.all(width: 8, color: Colors.black),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          offset: Offset(0, 2),
+                          blurRadius: 4,
+                        ),
+                      ],
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -245,27 +250,30 @@ class _GamePageState extends State<GamePage> {
 
   Widget buildBlockUnit(int row, int col) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         // setState(() {
         //   pasteItemToTable(row, col, currentTurn);
         // });
+        await _audioPlayer.setSource(AssetSource('audio/click_sound_1.mp3'));
+        // await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+        await _audioPlayer.resume();
         if (currentTurn == ITEM_BLACK) {
           bool moved = pasteItemToTable(row, col, ITEM_BLACK);
           if (moved) {
-            setState(() {}); // Refresh UI for human move
+            setState(() {});
             playBotMove();
           }
         }
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Color(0xff27ae60),
-          borderRadius: BorderRadius.circular(2),
+          color: primaryColor,
+          borderRadius: getBorderRadius(row, col),
         ),
         width: BLOCK_SIZE,
         height: BLOCK_SIZE,
-        margin: EdgeInsets.all(2),
-        child: Center(child: buildItem(table[row][col])),
+        margin: EdgeInsets.all(1),
+        child: Center(child: buildItem(board.getTable()[row][col])),
       ),
     );
   }
@@ -288,19 +296,19 @@ class _GamePageState extends State<GamePage> {
   }
 
   bool pasteItemToTable(int row, int col, int item) {
-    if (table[row][col].value == ITEM_EMPTY) {
+    if (board.getTable()[row][col].value == ITEM_EMPTY) {
       List<Coordinate> listCoordinate = [];
-      listCoordinate.addAll(board.checkRight(row, col, item, table));
-      listCoordinate.addAll(board.checkDown(row, col, item, table));
-      listCoordinate.addAll(board.checkLeft(row, col, item, table));
-      listCoordinate.addAll(board.checkUp(row, col, item, table));
-      listCoordinate.addAll(board.checkUpLeft(row, col, item, table));
-      listCoordinate.addAll(board.checkUpRight(row, col, item, table));
-      listCoordinate.addAll(board.checkDownLeft(row, col, item, table));
-      listCoordinate.addAll(board.checkDownRight(row, col, item, table));
+      listCoordinate.addAll(board.checkRight(row, col, item));
+      listCoordinate.addAll(board.checkDown(row, col, item));
+      listCoordinate.addAll(board.checkLeft(row, col, item));
+      listCoordinate.addAll(board.checkUp(row, col, item));
+      listCoordinate.addAll(board.checkUpLeft(row, col, item));
+      listCoordinate.addAll(board.checkUpRight(row, col, item));
+      listCoordinate.addAll(board.checkDownLeft(row, col, item));
+      listCoordinate.addAll(board.checkDownRight(row, col, item));
 
       if (listCoordinate.isNotEmpty) {
-        table[row][col].value = item;
+        board.getTable()[row][col].value = item;
         inverseItemFromList(listCoordinate);
         currentTurn = inverseItem(currentTurn);
         updateCountItem();
@@ -311,6 +319,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   void inverseItemFromList(List<Coordinate> list) {
+    List<List<BlockUnit>> table = board.getTable();
     for (Coordinate c in list) {
       table[c.row][c.col].value = inverseItem(table[c.row][c.col].value);
     }
@@ -326,6 +335,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   void updateCountItem() {
+    List<List<BlockUnit>> table = board.getTable();
     countItemBlack = 0;
     countItemWhite = 0;
     for (int row = 0; row < 8; row++) {
@@ -344,37 +354,16 @@ class _GamePageState extends State<GamePage> {
       countItemWhite = 0;
       countItemBlack = 0;
       currentTurn = ITEM_BLACK;
-      initTable();
-      initTableItems();
+      board.initTable();
+      board.initTableItems();
     });
   }
 
-  // Level 1 AI
-  List<Coordinate> getAllValidMoves(int playerItem) {
-    List<Coordinate> validMoves = [];
-    for (int row = 0; row < 8; row++) {
-      for (int col = 0; col < 8; col++) {
-        if (table[row][col].value == ITEM_EMPTY) {
-          // Try placing the item hypothetically
-          if (board.checkRight(row, col, playerItem, table).isNotEmpty ||
-              board.checkLeft(row, col, playerItem, table).isNotEmpty ||
-              board.checkDown(row, col, playerItem, table).isNotEmpty ||
-              board.checkUp(row, col, playerItem, table).isNotEmpty ||
-              board.checkUpLeft(row, col, playerItem, table).isNotEmpty ||
-              board.checkUpRight(row, col, playerItem, table).isNotEmpty ||
-              board.checkDownLeft(row, col, playerItem, table).isNotEmpty ||
-              board.checkDownRight(row, col, playerItem, table).isNotEmpty) {
-            validMoves.add(Coordinate(row: row, col: col));
-          }
-        }
-      }
-    }
-    return validMoves;
-  }
+  // Level 1 AI Bot
 
   void playBotMove() {
     Future.delayed(Duration(milliseconds: 2000), () {
-      List<Coordinate> moves = getAllValidMoves(ITEM_WHITE);
+      List<Coordinate> moves = board.getAllValidMoves(ITEM_WHITE);
       if (moves.isNotEmpty) {
         Coordinate move = moves[Random().nextInt(moves.length)];
         setState(() {
