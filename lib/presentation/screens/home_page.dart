@@ -2,15 +2,18 @@ import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:othello/controllers/game_state_controller.dart';
 import 'package:othello/game/board.dart';
 import 'package:othello/models/block_unit.dart';
 import 'package:othello/models/coordinate.dart';
 import 'package:othello/presentation/widgets/board_boarder_radius.dart';
+import 'package:othello/presentation/widgets/count_dashboard.dart';
 import 'package:othello/presentation/widgets/menu_tab.dart';
 import 'package:othello/utils/constants.dart';
 
 class GamePage extends StatefulWidget {
-  const GamePage({super.key});
+  const GamePage({super.key, required this.isWithBot});
+  final bool isWithBot;
 
   @override
   _GamePageState createState() => _GamePageState();
@@ -29,11 +32,6 @@ class _GamePageState extends State<GamePage> {
     _audioPlayer = AudioPlayer();
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
     super.initState();
-  }
-
-  int randomItem() {
-    Random random = Random();
-    return random.nextInt(3);
   }
 
   @override
@@ -55,8 +53,43 @@ class _GamePageState extends State<GamePage> {
           ),
           child: Column(
             children: <Widget>[
-              MenuTab(),
-              buildMenu(),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 15,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    MenuCard(title: 'Menu', onTap: () {}),
+                    MenuCard(
+                      title: 'New',
+                      onTap: () {
+                        restart();
+                      },
+                    ),
+                    MenuCard(
+                      title: 'Pass',
+                      onTap: () {
+                        setState(() {
+                          currentTurn = ITEM_WHITE;
+                        });
+                        playBotMove();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              CountDashboard(
+                count: countItemWhite,
+                difficulty: GameDifficulty.easy,
+                isPlayer1: false,
+                isBot: true,
+                name: '',
+                currentTurn: currentTurn == ITEM_BLACK,
+              ),
+
               Expanded(
                 child: Center(
                   child: Container(
@@ -66,7 +99,7 @@ class _GamePageState extends State<GamePage> {
                       border: Border.all(width: 8, color: Colors.black),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withOpacity(0.1),
                           offset: Offset(0, 2),
                           blurRadius: 4,
                         ),
@@ -80,158 +113,20 @@ class _GamePageState extends State<GamePage> {
                   ),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        currentTurn = ITEM_WHITE;
-                      });
-                      playBotMove();
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Color(0xff2c3e50),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        "Pass",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+
+              CountDashboard(
+                count: countItemBlack,
+                difficulty: GameDifficulty.easy,
+                isPlayer1: true,
+                isBot: false,
+                name: 'Jeno',
+                currentTurn: currentTurn == ITEM_WHITE,
               ),
-              SizedBox(height: 16),
-              buildScoreTab(),
+              SizedBox(height: 80),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Container buildMenu() {
-    return Container(
-      padding: EdgeInsets.only(top: 36, bottom: 12, left: 16, right: 16),
-      color: Color(0xff34495e),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          GestureDetector(
-            onTap: () {
-              restart();
-            },
-            child: Container(
-              constraints: BoxConstraints(minWidth: 120),
-              decoration: BoxDecoration(
-                color: Color(0xff27ae60),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              padding: EdgeInsets.all(12),
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    "New Game",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(child: Container()),
-          Container(
-            constraints: BoxConstraints(minWidth: 120),
-            decoration: BoxDecoration(
-              color: Color(0xffbbada0),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            padding: EdgeInsets.all(8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  "TURN",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 8),
-                  child: buildItem(BlockUnit(value: currentTurn)),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildScoreTab() {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        Expanded(
-          child: Container(
-            color: Color(0xff34495e),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(16),
-                  child: buildItem(BlockUnit(value: ITEM_WHITE)),
-                ),
-                Text(
-                  "x $countItemWhite",
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Expanded(
-          child: Container(
-            color: Color(0xffbdc3c7),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(16),
-                  child: buildItem(BlockUnit(value: ITEM_BLACK)),
-                ),
-                Text(
-                  "x $countItemBlack",
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -255,7 +150,6 @@ class _GamePageState extends State<GamePage> {
         //   pasteItemToTable(row, col, currentTurn);
         // });
         await _audioPlayer.setSource(AssetSource('audio/click_sound_1.mp3'));
-        // await _audioPlayer.setReleaseMode(ReleaseMode.loop);
         await _audioPlayer.resume();
         if (currentTurn == ITEM_BLACK) {
           bool moved = pasteItemToTable(row, col, ITEM_BLACK);
@@ -358,8 +252,6 @@ class _GamePageState extends State<GamePage> {
       board.initTableItems();
     });
   }
-
-  // Level 1 AI Bot
 
   void playBotMove() {
     Future.delayed(Duration(milliseconds: 2000), () {

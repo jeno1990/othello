@@ -38,95 +38,106 @@ class _LandingPageState extends State<LandingPage> {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => GetBuilder<GameStateController>(
-        builder: (controller) => Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.black87,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.white24,
-                blurRadius: 10,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                margin: const EdgeInsets.all(10),
-                width: 50,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.white38,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    const Text(
-                      'SELECT DIFFICULTY',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+      builder:
+          (context) => GetBuilder<GameStateController>(
+            builder:
+                (controller) => Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.white24,
+                        blurRadius: 10,
+                        spreadRadius: 2,
                       ),
-                    ),
-                    const SizedBox(height: 30),
-                    _difficultyButton(
-                      'EASY',
-                      Colors.green,
-                      controller.gameDifficulty == GameDifficulty.easy,
-                      () {
-                        controller.setGameDifficulty(GameDifficulty.easy);
-                        controller.update();
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    _difficultyButton(
-                      'MEDIUM',
-                      Colors.orange,
-                      controller.gameDifficulty == GameDifficulty.medium,
-                      () {
-                        controller.setGameDifficulty(GameDifficulty.medium);
-                        controller.update();
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    _difficultyButton(
-                      'HARD',
-                      Colors.red,
-                      controller.gameDifficulty == GameDifficulty.hard,
-                      () {
-                        controller.setGameDifficulty(GameDifficulty.hard);
-                        controller.update();
-                      },
-                    ),
-                    const SizedBox(height: 45),
-                    PlayButton(
-                      title: 'PLAY NOW',
-                      onPressed: () {
-                        Navigator.pop(context); // ✅ Close sheet only here
-                        Get.to(() => const GamePage());
-                      },
-                      centerTitle: true,
-                      shadowColor: Colors.white70,
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.all(10),
+                        width: 50,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: Colors.white38,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            const Text(
+                              'SELECT DIFFICULTY',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            _difficultyButton(
+                              'EASY',
+                              Colors.green,
+                              controller.gameDifficulty == GameDifficulty.easy,
+                              () {
+                                controller.setGameDifficulty(
+                                  GameDifficulty.easy,
+                                );
+                                controller.update();
+                              },
+                            ),
+                            const SizedBox(height: 15),
+                            _difficultyButton(
+                              'MEDIUM',
+                              Colors.orange,
+                              controller.gameDifficulty ==
+                                  GameDifficulty.medium,
+                              () {
+                                controller.setGameDifficulty(
+                                  GameDifficulty.medium,
+                                );
+                                controller.update();
+                              },
+                            ),
+                            const SizedBox(height: 15),
+                            _difficultyButton(
+                              'HARD',
+                              Colors.red,
+                              controller.gameDifficulty == GameDifficulty.hard,
+                              () {
+                                controller.setGameDifficulty(
+                                  GameDifficulty.hard,
+                                );
+                                controller.update();
+                              },
+                            ),
+                            const SizedBox(height: 45),
+                            PlayButton(
+                              title: 'PLAY NOW',
+                              onPressed: () {
+                                Navigator.pop(
+                                  context,
+                                ); // ✅ Close sheet only here
+                                Get.to(() => const GamePage(isWithBot: true));
+                              },
+                              centerTitle: true,
+                              shadowColor: Colors.white70,
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
           ),
-        ),
-      ),
     );
   }
 
@@ -175,7 +186,7 @@ class _LandingPageState extends State<LandingPage> {
                   icon: Icons.people,
                   title: '2 PLAYERS',
                   onPressed: () {
-                    Get.to(() => const GamePage());
+                    Get.to(() => const GamePage(isWithBot: false));
                   },
                 ),
                 const Spacer(),
