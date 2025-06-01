@@ -4,7 +4,7 @@ class GameSoundContoller extends GetxController {
   bool _isSoundOn = true;
   bool get isSoundOn => _isSoundOn;
 
-  void setSound() {
+ void toggleSound() {
     _isSoundOn = !_isSoundOn;
     update();
   }
