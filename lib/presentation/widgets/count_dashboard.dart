@@ -98,16 +98,19 @@ class CountDashboard extends StatelessWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: isPlayer1 ? Colors.black : Colors.white,
-                            border: Border.all(color: Colors.white, width: 2),
+                            border: Border.all(
+                              color: isPlayer1 ? Colors.white : Colors.grey,
+                              width: 2,
+                            ),
                           ),
                         ),
                         SizedBox(width: 10),
                         Text(
-                          isBot ? 'Bot' : name,
+                          isBot ? 'Computer' : name,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
@@ -115,8 +118,8 @@ class CountDashboard extends StatelessWidget {
                     // Divider(color: Colors.white, thickness: 1),
                     SizedBox(height: 2),
                     Text(
-                      isBot ? difficulty.name : 'Canada',
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                      isBot ? '${difficulty.name} Difficulty' : 'Canada',
+                      style: TextStyle(color: Colors.white70, fontSize: 15),
                     ),
                   ],
                 ),
