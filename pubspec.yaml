@@ -33,6 +33,9 @@ dependencies:
   flutter:
     sdk: flutter
   get: ^4.7.2
+  get_storage: ^2.1.1
+  intl: ^0.18.1
+  country_picker: ^2.0.21
 
 dev_dependencies:
   flutter_lints: ^5.0.0
