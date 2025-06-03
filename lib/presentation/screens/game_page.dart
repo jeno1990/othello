@@ -11,7 +11,7 @@ import 'package:othello/controllers/game_state_controller.dart';
 import 'package:othello/controllers/sound_state_controller.dart';
 import 'package:othello/controllers/user_profile_controller.dart';
 import 'package:othello/models/block_unit.dart';
-import 'package:othello/models/coordinate.dart';
+
 import 'package:othello/presentation/screens/settings_page.dart';
 import 'package:othello/presentation/widgets/board_boarder_radius.dart';
 import 'package:othello/presentation/widgets/count_dashboard.dart';
@@ -120,17 +120,43 @@ class _GamePageState extends State<GamePage> {
                     MenuCard(
                       title: 'New',
                       onTap: () {
-                        // Simply call controller.restart() and recalc valid moves
-                        boardController.restart();
-                        final available = boardController.board
-                            .getAllValidMoves(boardController.currentTurn);
-                        boardController.buildValidMoves(available);
+                        Get.defaultDialog(
+                          title: 'Are you sure?',
+                          middleText:
+                              'Do you want to start a new game? If not please click outside.',
+                          confirmTextColor: Colors.white,
+                          titlePadding: const EdgeInsets.only(top: 20),
+                          confirm: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                            ),
+                            child: const Text(
+                              'Continue',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            onPressed: () {
+                              boardController.restart();
+                              final available = boardController.board
+                                  .getAllValidMoves(
+                                    boardController.currentTurn,
+                                  );
+                              boardController.buildValidMoves(available);
+                              Navigator.pop(context);
+                            },
+                          ),
+                          onConfirm: () {
+                            Navigator.pop(context);
+                            boardController.restart();
+                            final available = boardController.board
+                                .getAllValidMoves(boardController.currentTurn);
+                            boardController.buildValidMoves(available);
+                          },
+                        );
                       },
                     ),
                     MenuCard(
                       title: 'Pass',
                       onTap: () {
-                        // Switch turn locally, then clear/build moves
                         boardController.clearMoves();
                         final nextTurn =
                             (boardController.currentTurn == ITEM_BLACK)
@@ -149,6 +175,10 @@ class _GamePageState extends State<GamePage> {
                         if (widget.isWithBot &&
                             boardController.currentTurn == ITEM_WHITE) {
                           _playBotMove();
+                        }
+                        if (boardController.isGameOver) {
+                          _showGameOverDialog();
+                          return;
                         }
                       },
                     ),
@@ -234,6 +264,8 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget _buildBlockUnit(int row, int col) {
+    double blockSize = MediaQuery.of(context).size.width / 9;
+
     return GestureDetector(
       onTap: () async {
         // Play click sound if enabled
@@ -254,11 +286,14 @@ class _GamePageState extends State<GamePage> {
 
         // 3) If it was a legal move: rebuild valid moves for next turn
         if (moved) {
-          // If with bot, let bot move immediately after user (if it’s bot’s turn)
+          // check if game is over
+          if (boardController.isGameOver) {
+            _showGameOverDialog();
+            return;
+          }
           if (widget.isWithBot && boardController.currentTurn == ITEM_WHITE) {
             _playBotMove();
           } else {
-            // Otherwise, just highlight valid squares for the next human turn
             final available = boardController.board.getAllValidMoves(
               boardController.currentTurn,
             );
@@ -267,7 +302,6 @@ class _GamePageState extends State<GamePage> {
         }
       },
       child: GetBuilder<BoardController>(
-        // Rebuild whenever the board’s table changes
         builder: (boardController) {
           final block = boardController.board.getTable()[row][col];
           return Container(
@@ -275,8 +309,8 @@ class _GamePageState extends State<GamePage> {
               color: primaryColor,
               borderRadius: getBorderRadius(row, col),
             ),
-            width: BLOCK_SIZE,
-            height: BLOCK_SIZE,
+            width: blockSize,
+            height: blockSize,
             margin: const EdgeInsets.all(1),
             child: Center(child: _buildItem(block)),
           );
@@ -317,12 +351,74 @@ class _GamePageState extends State<GamePage> {
       final move = ai.selectMove(ITEM_WHITE);
       if (move != null) {
         boardController.pasteItemToTable(move.row, move.col, ITEM_WHITE);
+        if (boardController.isGameOver) {
+          _showGameOverDialog();
+          return;
+        }
       }
-      // Show valid moves for the next turn (black or white)
+
       final available = boardController.board.getAllValidMoves(
         boardController.currentTurn,
       );
       boardController.buildValidMoves(available);
     });
+  }
+
+  void _showGameOverDialog() {
+    final blackCount = boardController.countItemBlack;
+    final whiteCount = boardController.countItemWhite;
+
+    String resultText;
+    if (blackCount > whiteCount) {
+      resultText = 'Black wins!';
+    } else if (whiteCount > blackCount) {
+      resultText = 'White wins!';
+    } else {
+      resultText = 'It\'s a tie!';
+    }
+
+    Get.defaultDialog(
+      title: 'Game Over',
+      titleStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Final Score',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Black: $blackCount    White: $whiteCount',
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            resultText,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+      // “Play Again” button
+      confirm: ElevatedButton(
+        onPressed: () {
+          boardController.restart();
+          final available = boardController.board.getAllValidMoves(
+            boardController.currentTurn,
+          );
+          boardController.buildValidMoves(available);
+          Get.back();
+        },
+        child: const Text('Play Again'),
+      ),
+      cancel: ElevatedButton(
+        onPressed: () {
+          Get.back();
+          Get.back();
+        },
+        child: const Text('Home'),
+      ),
+    );
   }
 }
