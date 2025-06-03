@@ -10,8 +10,11 @@ class InitBinding extends Bindings {
   void dependencies() {
     Get.put(GameStateController());
     Get.put(GameSoundContoller());
-    Get.put(UserProfileController());
-
+    // Get.put(UserProfileController());
+    Get.put(
+      UserProfileController(),
+      permanent: true,
+    ); // Keep all existing logic
     final audioPlayer = AudioPlayer();
 
     Get.put<AudioPlayer>(audioPlayer);

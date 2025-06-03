@@ -27,6 +27,7 @@ class _LandingPageState extends State<LandingPage> {
     _audioPlayer = Get.find<AudioPlayer>();
     _audioPlayer.setReleaseMode(ReleaseMode.loop);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(seconds: 2));
       await _audioPlayer.setSource(AssetSource('audio/background_music.wav'));
       await _audioPlayer.resume();
     });

@@ -9,7 +9,6 @@ import 'package:othello/presentation/screens/landing_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  Get.put(UserProfileController(), permanent: true); // Keep all existing logic
   runApp(const MyApp());
 }
 
@@ -69,8 +68,7 @@ class _SplashWrapperState extends State<SplashWrapper> {
     return Stack(
       children: [
         const LandingPage(), // Your actual home
-        if (_showSplash)
-          const SplashScreenOverlay(), // Only shows for 3s
+        if (_showSplash) const SplashScreenOverlay(), // Only shows for 3s
       ],
     );
   }
@@ -95,10 +93,10 @@ class _SplashScreenOverlayState extends State<SplashScreenOverlay>
       vsync: this,
       duration: const Duration(seconds: 2),
     );
-    _scaleAnim = Tween<double>(begin: 0.6, end: 1.0).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
+    _scaleAnim = Tween<double>(
+      begin: 0.6,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     _controller.forward();
   }
 
