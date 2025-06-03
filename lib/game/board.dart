@@ -194,4 +194,19 @@ class Board {
     }
     return validMoves;
   }
+
+  (int, int) countItems() {
+    int countItemBlack = 0;
+    int countItemWhite = 0;
+    for (int row = 0; row < 8; row++) {
+      for (int col = 0; col < 8; col++) {
+        if (table[row][col].value == ITEM_BLACK) {
+          countItemBlack++;
+        } else if (table[row][col].value == ITEM_WHITE) {
+          countItemWhite++;
+        }
+      }
+    }
+    return (countItemBlack, countItemWhite);
+  }
 }

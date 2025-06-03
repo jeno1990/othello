@@ -7,9 +7,12 @@ import 'package:othello/controllers/user_profile_controller.dart';
 class InitBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put<AudioPlayer>(AudioPlayer());
     Get.put(GameStateController());
     Get.put(GameSoundContoller());
     Get.put(UserProfileController());
+
+    final audioPlayer = AudioPlayer();
+
+    Get.put<AudioPlayer>(audioPlayer);
   }
 }

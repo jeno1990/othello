@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
 import 'package:othello/controllers/game_state_controller.dart';
+import 'package:othello/controllers/sound_state_controller.dart';
 import 'package:othello/presentation/screens/home_page.dart';
 import 'package:othello/presentation/widgets/play_button.dart';
 import 'package:othello/presentation/screens/settings_page.dart';
@@ -19,7 +20,8 @@ class _LandingPageState extends State<LandingPage> {
   @override
   void initState() {
     super.initState();
-    _audioPlayer = AudioPlayer();
+
+    _audioPlayer = Get.find<AudioPlayer>();
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _audioPlayer.setSource(AssetSource('audio/background_music.wav'));
@@ -29,7 +31,7 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
+    // _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -38,151 +40,171 @@ class _LandingPageState extends State<LandingPage> {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => GetBuilder<GameStateController>(
-        builder: (controller) => Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.black87,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.white24,
-                blurRadius: 10,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                margin: const EdgeInsets.all(10),
-                width: 50,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.white38,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    const Text(
-                      'SELECT DIFFICULTY',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+      builder:
+          (context) => GetBuilder<GameStateController>(
+            builder:
+                (controller) => Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.white24,
+                        blurRadius: 10,
+                        spreadRadius: 2,
                       ),
-                    ),
-                    const SizedBox(height: 30),
-                    _difficultyButton(
-                      'EASY',
-                      Colors.green,
-                      controller.gameDifficulty == GameDifficulty.easy,
-                      () {
-                        controller.setGameDifficulty(GameDifficulty.easy);
-                        controller.update();
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    _difficultyButton(
-                      'MEDIUM',
-                      Colors.orange,
-                      controller.gameDifficulty == GameDifficulty.medium,
-                      () {
-                        controller.setGameDifficulty(GameDifficulty.medium);
-                        controller.update();
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    _difficultyButton(
-                      'HARD',
-                      Colors.red,
-                      controller.gameDifficulty == GameDifficulty.hard,
-                      () {
-                        controller.setGameDifficulty(GameDifficulty.hard);
-                        controller.update();
-                      },
-                    ),
-                    const SizedBox(height: 45),
-                    PlayButton(
-                      title: 'PLAY NOW',
-                      onPressed: () {
-                        Navigator.pop(context); // ✅ Close sheet only here
-                        Get.to(() => const GamePage());
-                      },
-                      centerTitle: true,
-                      shadowColor: Colors.white70,
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.all(10),
+                        width: 50,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: Colors.white38,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            const Text(
+                              'SELECT DIFFICULTY',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            _difficultyButton(
+                              'EASY',
+                              Colors.green,
+                              controller.gameDifficulty == GameDifficulty.Easy,
+                              () {
+                                controller.setGameDifficulty(
+                                  GameDifficulty.Easy,
+                                );
+                                controller.update();
+                              },
+                            ),
+                            const SizedBox(height: 15),
+                            _difficultyButton(
+                              'MEDIUM',
+                              Colors.orange,
+                              controller.gameDifficulty ==
+                                  GameDifficulty.Medium,
+                              () {
+                                controller.setGameDifficulty(
+                                  GameDifficulty.Medium,
+                                );
+                                controller.update();
+                              },
+                            ),
+                            const SizedBox(height: 15),
+                            _difficultyButton(
+                              'HARD',
+                              Colors.red,
+                              controller.gameDifficulty == GameDifficulty.Hard,
+                              () {
+                                controller.setGameDifficulty(
+                                  GameDifficulty.Hard,
+                                );
+                                controller.update();
+                              },
+                            ),
+                            const SizedBox(height: 45),
+                            PlayButton(
+                              title: 'PLAY NOW',
+                              onPressed: () {
+                                Navigator.pop(
+                                  context,
+                                ); // ✅ Close sheet only here
+                                Get.to(() => const GamePage(isWithBot: true));
+                              },
+                              centerTitle: true,
+                              shadowColor: Colors.white70,
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
           ),
-        ),
-      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // Background image
-          Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/image/ottelo.webp'),
-                fit: BoxFit.cover,
-              ),
+      body: Container(
+        alignment: Alignment.center,
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/image/ottelo.webp'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Column(
+          children: [
+            Spacer(),
+            Spacer(),
+            PlayButton(
+              icon: Icons.smart_toy,
+              title: 'PLAY VS COMPUTER',
+              onPressed: () {
+                _showDifficultyBottomSheet();
+              },
             ),
-          ),
-
-          // Top-right settings button
-          Positioned(
-            top: 30,
-            right: 20,
-            child: bottomSettings(Icons.settings, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SettingsPage()),
-              );
-            }),
-          ),
-
-          // Main content
-          Center(
-            child: Column(
+            SizedBox(height: 40),
+            PlayButton(
+              icon: Icons.people,
+              title: '2 PLAYERS',
+              onPressed: () {
+                Get.to(() => const GamePage(isWithBot: false));
+              },
+            ),
+            Spacer(),
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Spacer(),
-                PlayButton(
-                  icon: Icons.smart_toy,
-                  title: 'PLAY VS COMPUTER',
-                  onPressed: _showDifficultyBottomSheet,
-                ),
-                const SizedBox(height: 40),
-                PlayButton(
-                  icon: Icons.people,
-                  title: '2 PLAYERS',
-                  onPressed: () {
-                    Get.to(() => const GamePage());
+                bottomSettings(Icons.settings, () {
+                  Get.to(() => const SettingsPage());
+                }),
+                SizedBox(width: 20),
+                GetBuilder<GameSoundContoller>(
+                  builder: (controller) {
+                    return bottomSettings(
+                      controller.isBackgroundSoundOn
+                          ? Icons.volume_up
+                          : Icons.volume_off,
+                      () {
+                        if (controller.isBackgroundSoundOn) {
+                          _audioPlayer.pause();
+                        } else {
+                          _audioPlayer.resume();
+                        }
+                        controller.toggleBackgroundMusic();
+                      },
+                    );
                   },
                 ),
-                const Spacer(),
               ],
             ),
-          ),
-        ],
+            SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }

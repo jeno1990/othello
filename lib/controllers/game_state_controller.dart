@@ -1,11 +1,12 @@
 import 'package:get/get.dart';
 
-enum GameDifficulty { easy, medium, hard }
+// ignore: constant_identifier_names
+enum GameDifficulty { Easy, Medium, Hard }
 
 class GameStateController extends GetxController {
   bool _isGameOver = false;
   bool _isTwoPlayerMode = false;
-  GameDifficulty _gameDifficulty = GameDifficulty.easy;
+  GameDifficulty _gameDifficulty = GameDifficulty.Easy;
 
   bool get isGameOver => _isGameOver;
   bool get isTwoPlayerMode => _isTwoPlayerMode;
