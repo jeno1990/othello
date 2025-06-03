@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:othello/controllers/game_state_controller.dart';
 import 'package:othello/game/board.dart';
 import 'package:othello/models/block_unit.dart';
 import 'package:othello/models/coordinate.dart';
@@ -50,6 +51,9 @@ class BoardController extends GetxController {
   }
 
   void buildValidMoves(List<Coordinate> list) {
+    final gameState = Get.find<GameStateController>();
+    if (!gameState.showMoves) return;
+
     List<List<BlockUnit>> table = _board.getTable();
     for (Coordinate c in list) {
       table[c.row][c.col].value = ITEM_VALID_MOVE;

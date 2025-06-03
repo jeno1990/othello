@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:othello/controllers/board_controller.dart';
 
 // ignore: constant_identifier_names
 enum GameDifficulty { Easy, Medium, Hard }
@@ -7,7 +8,7 @@ class GameStateController extends GetxController {
   bool _isGameOver = false;
   bool _isTwoPlayerMode = false;
   GameDifficulty _gameDifficulty = GameDifficulty.Easy;
-  bool _showMoves = false;
+  bool _showMoves = true;
 
   bool get isGameOver => _isGameOver;
   bool get isTwoPlayerMode => _isTwoPlayerMode;
@@ -29,7 +30,15 @@ class GameStateController extends GetxController {
   }
 
   void setShowMoves() {
+    final boardState = Get.find<BoardController>();
     _showMoves = !showMoves;
     update();
+    if (!_showMoves) {
+      boardState.clearMoves();
+    } else {
+      boardState.buildValidMoves(
+        boardState.board.getAllValidMoves(boardState.currentTurn),
+      );
+    }
   }
 }
