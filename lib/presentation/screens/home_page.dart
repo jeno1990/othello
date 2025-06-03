@@ -29,6 +29,7 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   late final UserProfileController userController;
+  late final GameStateController gameStateController;
   late final AudioPlayer _audioPlayer;
   late final Board board;
   int currentTurn = ITEM_BLACK;
@@ -39,6 +40,7 @@ class _GamePageState extends State<GamePage> {
   @override
   void initState() {
     userController = Get.find<UserProfileController>();
+    gameStateController = Get.find<GameStateController>();
     board = Board();
     // ai = RandomAI(board: board);
     ai = GreedyAI(board: board);
@@ -284,6 +286,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   void buildValidMoves(List<Coordinate> list) {
+    if (!gameStateController.showMoves) return;
     List<List<BlockUnit>> table = board.getTable();
     for (Coordinate c in list) {
       table[c.row][c.col].value = ITEM_VALID_MOVE;
