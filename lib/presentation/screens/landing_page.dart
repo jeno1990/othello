@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
+import 'package:othello/controllers/board_controller.dart';
 import 'package:othello/controllers/game_state_controller.dart';
 import 'package:othello/controllers/sound_state_controller.dart';
-import 'package:othello/presentation/screens/home_page.dart';
+import 'package:othello/presentation/screens/game_page.dart';
 import 'package:othello/presentation/widgets/play_button.dart';
 import 'package:othello/presentation/screens/settings_page.dart';
 
@@ -22,7 +23,7 @@ class _LandingPageState extends State<LandingPage> {
     super.initState();
 
     _audioPlayer = Get.find<AudioPlayer>();
-    _audioPlayer.setReleaseMode(ReleaseMode.stop);
+    _audioPlayer.setReleaseMode(ReleaseMode.loop);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _audioPlayer.setSource(AssetSource('audio/background_music.wav'));
       await _audioPlayer.resume();
@@ -160,6 +161,24 @@ class _LandingPageState extends State<LandingPage> {
           children: [
             Spacer(),
             Spacer(),
+            //! continue from here
+            GetBuilder<BoardController>(
+              builder: (boardController) {
+                if (boardController.isWithBot != null) {
+                  return PlayButton(
+                    icon: Icons.keyboard_double_arrow_right_rounded,
+                    title: 'Continue Playing',
+                    onPressed: () {
+                      Get.to(
+                        () => GamePage(isWithBot: boardController.isWithBot!),
+                      );
+                    },
+                  );
+                }
+                return SizedBox();
+              },
+            ),
+            SizedBox(height: 40),
             PlayButton(
               icon: Icons.smart_toy,
               title: 'PLAY VS COMPUTER',
