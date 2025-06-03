@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:othello/controllers/board_controller.dart';
 import 'package:othello/controllers/game_state_controller.dart';
@@ -7,6 +7,7 @@ import 'package:othello/controllers/sound_state_controller.dart';
 import 'package:othello/presentation/screens/game_page.dart';
 import 'package:othello/presentation/widgets/play_button.dart';
 import 'package:othello/presentation/screens/settings_page.dart';
+import 'package:othello/presentation/widgets/play_button.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -16,7 +17,8 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
-  late final AudioPlayer _audioPlayer;
+  final soundController = Get.find<GameSoundContoller>();
+  late AudioPlayer _audioPlayer;
 
   @override
   void initState() {
@@ -25,6 +27,7 @@ class _LandingPageState extends State<LandingPage> {
     _audioPlayer = Get.find<AudioPlayer>();
     _audioPlayer.setReleaseMode(ReleaseMode.loop);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(seconds: 2));
       await _audioPlayer.setSource(AssetSource('audio/background_music.wav'));
       await _audioPlayer.resume();
     });
