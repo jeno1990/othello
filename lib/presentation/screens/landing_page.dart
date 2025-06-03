@@ -5,6 +5,7 @@ import 'package:othello/controllers/board_controller.dart';
 import 'package:othello/controllers/game_state_controller.dart';
 import 'package:othello/controllers/sound_state_controller.dart';
 import 'package:othello/presentation/screens/game_page.dart';
+import 'package:othello/presentation/widgets/difficulty_button.dart';
 import 'package:othello/presentation/widgets/play_button.dart';
 import 'package:othello/presentation/screens/settings_page.dart';
 import 'package:othello/presentation/widgets/play_button.dart';
@@ -85,14 +86,17 @@ class _LandingPageState extends State<LandingPage> {
                                 color: Colors.white,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: 'Pacifico',
                               ),
                             ),
                             const SizedBox(height: 30),
-                            _difficultyButton(
-                              'EASY',
-                              Colors.green,
-                              controller.gameDifficulty == GameDifficulty.Easy,
-                              () {
+                            DifficultyButton(
+                              text: 'EASY',
+                              color: Colors.green,
+                              selected:
+                                  controller.gameDifficulty ==
+                                  GameDifficulty.Easy,
+                              onPressed: () {
                                 controller.setGameDifficulty(
                                   GameDifficulty.Easy,
                                 );
@@ -100,12 +104,13 @@ class _LandingPageState extends State<LandingPage> {
                               },
                             ),
                             const SizedBox(height: 15),
-                            _difficultyButton(
-                              'MEDIUM',
-                              Colors.orange,
-                              controller.gameDifficulty ==
+                            DifficultyButton(
+                              text: 'MEDIUM',
+                              color: Colors.orange,
+                              selected:
+                                  controller.gameDifficulty ==
                                   GameDifficulty.Medium,
-                              () {
+                              onPressed: () {
                                 controller.setGameDifficulty(
                                   GameDifficulty.Medium,
                                 );
@@ -113,11 +118,13 @@ class _LandingPageState extends State<LandingPage> {
                               },
                             ),
                             const SizedBox(height: 15),
-                            _difficultyButton(
-                              'HARD',
-                              Colors.red,
-                              controller.gameDifficulty == GameDifficulty.Hard,
-                              () {
+                            DifficultyButton(
+                              text: 'HARD',
+                              color: Colors.red,
+                              selected:
+                                  controller.gameDifficulty ==
+                                  GameDifficulty.Hard,
+                              onPressed: () {
                                 controller.setGameDifficulty(
                                   GameDifficulty.Hard,
                                 );
@@ -164,7 +171,6 @@ class _LandingPageState extends State<LandingPage> {
           children: [
             Spacer(),
             Spacer(),
-            //! continue from here
             GetBuilder<BoardController>(
               builder: (boardController) {
                 if (boardController.isWithBot != null) {
@@ -228,42 +234,6 @@ class _LandingPageState extends State<LandingPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _difficultyButton(
-    String text,
-    Color color,
-    bool selected,
-    VoidCallback onPressed,
-  ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.play_arrow,
-          color: selected ? Colors.white : Colors.transparent,
-          size: 40,
-        ),
-        ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: color,
-            minimumSize: const Size(200, 50),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25),
-            ),
-          ),
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ],
     );
   }
 

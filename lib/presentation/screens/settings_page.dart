@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:othello/controllers/game_state_controller.dart';
 import 'package:othello/controllers/sound_state_controller.dart';
 import 'package:othello/presentation/screens/user_profile_page.dart';
+import 'package:othello/presentation/widgets/difficulty_button.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -198,39 +199,33 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               const SizedBox(height: 25),
-              _difficultyRow(
-                context,
-                'EASY',
-                Colors.green,
-                controller.gameDifficulty == GameDifficulty.Easy,
-                () {
+              DifficultyButton(
+                text: 'EASY',
+                color: Colors.green,
+                selected: controller.gameDifficulty == GameDifficulty.Easy,
+                onPressed: () {
                   controller.setGameDifficulty(GameDifficulty.Easy);
                   controller.update();
-                  Navigator.pop(context);
                 },
               ),
-              const SizedBox(height: 16),
-              _difficultyRow(
-                context,
-                'MEDIUM',
-                Colors.orange,
-                controller.gameDifficulty == GameDifficulty.Medium,
-                () {
+              const SizedBox(height: 15),
+              DifficultyButton(
+                text: 'MEDIUM',
+                color: Colors.orange,
+                selected: controller.gameDifficulty == GameDifficulty.Medium,
+                onPressed: () {
                   controller.setGameDifficulty(GameDifficulty.Medium);
                   controller.update();
-                  Navigator.pop(context);
                 },
               ),
-              const SizedBox(height: 16),
-              _difficultyRow(
-                context,
-                'HARD',
-                Colors.red,
-                controller.gameDifficulty == GameDifficulty.Hard,
-                () {
+              const SizedBox(height: 15),
+              DifficultyButton(
+                text: 'HARD',
+                color: Colors.red,
+                selected: controller.gameDifficulty == GameDifficulty.Hard,
+                onPressed: () {
                   controller.setGameDifficulty(GameDifficulty.Hard);
                   controller.update();
-                  Navigator.pop(context);
                 },
               ),
               const SizedBox(height: 20),
@@ -238,47 +233,6 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         );
       },
-    );
-  }
-
-  Widget _difficultyRow(
-    BuildContext context,
-    String label,
-    Color color,
-    bool isSelected,
-    VoidCallback onTap,
-  ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 30,
-          child:
-              isSelected
-                  ? const Icon(Icons.play_arrow, color: Colors.white, size: 26)
-                  : const SizedBox.shrink(),
-        ),
-        const SizedBox(width: 10),
-        ElevatedButton(
-          onPressed: onTap,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: color,
-            minimumSize: const Size(220, 50),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(40),
-            ),
-          ),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              letterSpacing: 1,
-            ),
-          ),
-        ),
-      ],
     );
   }
 

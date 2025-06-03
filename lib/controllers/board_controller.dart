@@ -14,6 +14,15 @@ class BoardController extends GetxController {
 
   Board get board => _board;
 
+  bool get isGameOver {
+    final totalPieces = _countItemBlack + _countItemWhite;
+    if (totalPieces == 64) return true;
+
+    final blackMoves = _board.getAllValidMoves(ITEM_BLACK);
+    final whiteMoves = _board.getAllValidMoves(ITEM_WHITE);
+    return blackMoves.isEmpty && whiteMoves.isEmpty;
+  }
+
   bool? get isWithBot => _isWithBot;
   set isWithBot(bool? value) {
     _isWithBot = value;

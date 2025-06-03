@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-const double BLOCK_SIZE = 45;
+// const double BLOCK_SIZE = 45;
 const double borderRadiusWide = 6;
 const double borderRadiusNarrow = 1;
 const int ITEM_EMPTY = 0;
