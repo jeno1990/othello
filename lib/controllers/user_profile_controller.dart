@@ -13,6 +13,8 @@ class UserProfileController extends GetxController {
   var password = ''.obs;
   var obscurePassword = true.obs;
 
+  String get usernameValue => username.value;
+
   @override
   void onInit() {
     super.onInit();
@@ -41,6 +43,10 @@ class UserProfileController extends GetxController {
     box.write('email', email.value);
     box.write('password', password.value);
 
-    Get.snackbar('Success', 'Profile saved successfully', snackPosition: SnackPosition.BOTTOM);
+    Get.snackbar(
+      'Success',
+      'Profile saved successfully',
+      snackPosition: SnackPosition.BOTTOM,
+    );
   }
 }

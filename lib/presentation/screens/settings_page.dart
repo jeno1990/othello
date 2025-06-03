@@ -112,6 +112,36 @@ class _SettingsPageState extends State<SettingsPage> {
                     );
                   },
                 ),
+                SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () {
+                    Get.to(() => UserProfilePage());
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 18,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[850],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'User Profile',
+                          style: TextStyle(color: Colors.white70, fontSize: 16),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             );
           },

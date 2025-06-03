@@ -8,6 +8,7 @@ import 'package:othello/ai/greedy_ai.dart';
 import 'package:othello/ai/random_ai.dart';
 import 'package:othello/controllers/game_state_controller.dart';
 import 'package:othello/controllers/sound_state_controller.dart';
+import 'package:othello/controllers/user_profile_controller.dart';
 import 'package:othello/game/board.dart';
 import 'package:othello/models/block_unit.dart';
 import 'package:othello/models/coordinate.dart';
@@ -26,6 +27,7 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
+  late final UserProfileController userController;
   late final AudioPlayer _audioPlayer;
   late final Board board;
   int currentTurn = ITEM_BLACK;
@@ -35,6 +37,7 @@ class _GamePageState extends State<GamePage> {
 
   @override
   void initState() {
+    userController = Get.find<UserProfileController>();
     board = Board();
     // ai = RandomAI(board: board);
     ai = GreedyAI(board: board);
@@ -145,15 +148,20 @@ class _GamePageState extends State<GamePage> {
                   ),
                 ),
               ),
-
               CountDashboard(
                 count: countItemBlack,
                 difficulty: Get.find<GameStateController>().gameDifficulty,
                 isPlayer1: widget.isWithBot,
                 isBot: false,
-                name: widget.isWithBot ? 'Player 1' : 'Player 2',
+                name:
+                    widget.isWithBot
+                        ? (userController.usernameValue != ''
+                            ? userController.usernameValue
+                            : 'Player 1')
+                        : 'Player 2',
                 currentTurn: currentTurn == ITEM_BLACK,
               ),
+
               SizedBox(height: 80),
             ],
           ),
