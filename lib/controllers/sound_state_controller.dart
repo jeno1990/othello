@@ -16,4 +16,14 @@ class GameSoundContoller extends GetxController {
     _isSoundEffectsOn = !_isSoundEffectsOn;
     update();
   }
+
+  // void resumeBackgroundMusic() async {
+  //   if (isSoundOn.value) {
+  //     await _player.resume();
+  //   }
+  // }
+
+  // void stopBackgroundMusic() async {
+  //   await _player.stop();
+  // }
 }

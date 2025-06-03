@@ -29,12 +29,12 @@ class UserProfilePage extends GetView<UserProfileController> {
             const Icon(Icons.person, size: 100, color: Colors.white70),
             const SizedBox(height: 20),
 
-            Obx(
-              () => _buildTextField(
-                'Username',
-                controller.username.value,
-                (val) => controller.username.value = val,
-              ),
+            TextField(
+              controller: controller.usernameCtrl,
+              onChanged: (val) => controller.username.value = val,
+              textAlign: TextAlign.left,
+              style: const TextStyle(color: Colors.white),
+              decoration: _inputDecoration('Username'),
             ),
             const SizedBox(height: 20),
 
@@ -58,12 +58,12 @@ class UserProfilePage extends GetView<UserProfileController> {
             ),
             const SizedBox(height: 20),
 
-            Obx(
-              () => _buildTextField(
-                'City',
-                controller.city.value,
-                (val) => controller.city.value = val,
-              ),
+            TextField(
+              controller: controller.cityCtrl,
+              onChanged: (val) => controller.city.value = val,
+              textAlign: TextAlign.left,
+              style: const TextStyle(color: Colors.white),
+              decoration: _inputDecoration('City'),
             ),
             const SizedBox(height: 20),
 
@@ -76,36 +76,52 @@ class UserProfilePage extends GetView<UserProfileController> {
             ),
             const SizedBox(height: 20),
 
-            Obx(
-              () => _buildTextField(
-                'Email',
-                controller.email.value,
-                (val) => controller.email.value = val,
-                keyboardType: TextInputType.emailAddress,
-              ),
+            TextField(
+              controller: controller.emailCtrl,
+              onChanged: (val) => controller.email.value = val,
+              keyboardType: TextInputType.emailAddress,
+              textAlign: TextAlign.left,
+              style: const TextStyle(color: Colors.white),
+              decoration: _inputDecoration('Email'),
             ),
             const SizedBox(height: 20),
 
             Obx(
-              () => _buildPasswordField(
-                'Password',
-                controller.password.value,
-                (val) => controller.password.value = val,
-                controller.obscurePassword.value,
-                () =>
-                    controller.obscurePassword.value =
-                        !controller.obscurePassword.value,
+              () => TextField(
+                controller: controller.passwordCtrl,
+                onChanged: (val) => controller.password.value = val,
+                obscureText: controller.obscurePassword.value,
+                textAlign: TextAlign.left,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  filled: true,
+                  fillColor: Colors.black54,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      controller.obscurePassword.value
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Colors.white70,
+                    ),
+                    onPressed:
+                        () =>
+                            controller.obscurePassword.value =
+                                !controller.obscurePassword.value,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 30),
 
             ElevatedButton(
-              onPressed: userController.saveProfile,
+              onPressed: controller.saveProfile,
               style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
-              child: const Text(
-                "Save Profile",
-                style: TextStyle(color: Colors.white),
-              ),
+              child: const Text("Save Profile"),
             ),
           ],
         ),
@@ -113,24 +129,13 @@ class UserProfilePage extends GetView<UserProfileController> {
     );
   }
 
-  Widget _buildTextField(
-    String label,
-    String value,
-    Function(String) onChanged, {
-    TextInputType? keyboardType,
-  }) {
-    return TextField(
-      onChanged: onChanged,
-      keyboardType: keyboardType,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.white70),
-        filled: true,
-        fillColor: Colors.black54,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      controller: TextEditingController(text: value),
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: Colors.white70),
+      filled: true,
+      fillColor: Colors.black54,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
     );
   }
 
@@ -156,13 +161,7 @@ class UserProfilePage extends GetView<UserProfileController> {
                 ),
               )
               .toList(),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.white70),
-        filled: true,
-        fillColor: Colors.black54,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      ),
+      decoration: _inputDecoration(label),
     );
   }
 
@@ -183,13 +182,7 @@ class UserProfilePage extends GetView<UserProfileController> {
         if (picked != null) onDateSelected(picked);
       },
       child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(color: Colors.white70),
-          filled: true,
-          fillColor: Colors.black54,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+        decoration: _inputDecoration(label),
         child: Text(
           DateFormat('yyyy-MM-dd').format(selectedDate),
           style: const TextStyle(color: Colors.white),
@@ -208,47 +201,12 @@ class UserProfilePage extends GetView<UserProfileController> {
         showCountryPicker(context: Get.context!, onSelect: onCountrySelected);
       },
       child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(color: Colors.white70),
-          filled: true,
-          fillColor: Colors.black54,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+        decoration: _inputDecoration(label),
         child: Text(
           selectedCountry.isEmpty ? 'Select Country' : selectedCountry,
           style: const TextStyle(color: Colors.white),
         ),
       ),
-    );
-  }
-
-  Widget _buildPasswordField(
-    String label,
-    String value,
-    Function(String) onChanged,
-    bool obscureText,
-    VoidCallback toggleVisibility,
-  ) {
-    return TextField(
-      onChanged: onChanged,
-      obscureText: obscureText,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.white70),
-        filled: true,
-        fillColor: Colors.black54,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        suffixIcon: IconButton(
-          icon: Icon(
-            obscureText ? Icons.visibility : Icons.visibility_off,
-            color: Colors.white70,
-          ),
-          onPressed: toggleVisibility,
-        ),
-      ),
-      controller: TextEditingController(text: value),
     );
   }
 }
