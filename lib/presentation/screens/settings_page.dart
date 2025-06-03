@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:othello/controllers/game_state_controller.dart';
 import 'package:othello/controllers/sound_state_controller.dart';
+import 'package:othello/presentation/screens/user_profile_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -19,8 +19,9 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF1E1E1E),
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: const Text('Settings', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black87,
+        iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
       ),
       body: Padding(
@@ -30,6 +31,7 @@ class _SettingsPageState extends State<SettingsPage> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Difficulty
                 GestureDetector(
                   onTap: () => _showDifficultyBottomSheet(context, controller),
                   child: Container(
@@ -41,10 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Difficulty',
-                          style: TextStyle(color: Colors.white70, fontSize: 16),
-                        ),
+                        const Text('Difficulty', style: TextStyle(color: Colors.white70, fontSize: 16)),
                         Text(
                           _difficultyLabel(controller.gameDifficulty),
                           style: const TextStyle(color: Colors.white, fontSize: 16),
@@ -55,40 +54,45 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 30),
 
-                _buildToggleTile(
-                  'Show Moves',
-                  showMoves,
-                  (val) {
-                    setState(() {
-                      showMoves = val;
-                    });
-                  },
-                ),
+                // Show Moves Toggle
+                _buildToggleTile('Show Moves', showMoves, (val) {
+                  setState(() => showMoves = val);
+                }),
                 const SizedBox(height: 16),
 
-                // ✅ FINAL: Sound Toggle with guaranteed first-click behavior
-                GetBuilder<GameSoundContoller>(
-                  builder: (soundController) {
-                    return _buildToggleTile(
-                      'Sound',
-                      soundController.isSoundOn,
-                      (val) async {
-                        final audioPlayer = Get.find<AudioPlayer>();
+                // ✅ Updated Sound Toggle (RxBool)
+                Obx(() {
+                  final soundController = Get.find<GameSoundContoller>();
+                  return _buildToggleTile(
+                    'Sound',
+                    soundController.isSoundOn.value,
+                    (val) => soundController.toggleSound(),
+                  );
+                }),
+                const SizedBox(height: 16),
 
-                        try {
-                          if (soundController.isSoundOn) {
-                            await audioPlayer.pause();
-                          } else {
-                            await audioPlayer.resume(); // ✅ no reset needed
-                          }
-
-                          soundController.toggleSound(); // flip AFTER
-                        } catch (e) {
-                          print('Audio error: $e');
-                        }
-                      },
+                // User Profile
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const UserProfilePage()),
                     );
                   },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[850],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('User Profile', style: TextStyle(color: Colors.white70, fontSize: 16)),
+                        Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             );
@@ -98,8 +102,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildToggleTile(
-      String title, bool value, Function(bool) onChanged) {
+  Widget _buildToggleTile(String title, bool value, Function(bool) onChanged) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey[850],
@@ -115,8 +118,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showDifficultyBottomSheet(
-      BuildContext context, GameStateController controller) {
+  void _showDifficultyBottomSheet(BuildContext context, GameStateController controller) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.black,
@@ -139,44 +141,23 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               const SizedBox(height: 25),
-
-              _difficultyRow(
-                context,
-                label: 'EASY',
-                color: Colors.green,
-                isSelected: controller.gameDifficulty == GameDifficulty.easy,
-                onTap: () {
-                  controller.setGameDifficulty(GameDifficulty.easy);
-                  controller.update();
-                  Navigator.pop(context);
-                },
-              ),
+              _difficultyRow(context, 'EASY', Colors.green, controller.gameDifficulty == GameDifficulty.easy, () {
+                controller.setGameDifficulty(GameDifficulty.easy);
+                controller.update();
+                Navigator.pop(context);
+              }),
               const SizedBox(height: 16),
-
-              _difficultyRow(
-                context,
-                label: 'MEDIUM',
-                color: Colors.orange,
-                isSelected: controller.gameDifficulty == GameDifficulty.medium,
-                onTap: () {
-                  controller.setGameDifficulty(GameDifficulty.medium);
-                  controller.update();
-                  Navigator.pop(context);
-                },
-              ),
+              _difficultyRow(context, 'MEDIUM', Colors.orange, controller.gameDifficulty == GameDifficulty.medium, () {
+                controller.setGameDifficulty(GameDifficulty.medium);
+                controller.update();
+                Navigator.pop(context);
+              }),
               const SizedBox(height: 16),
-
-              _difficultyRow(
-                context,
-                label: 'HARD',
-                color: Colors.red,
-                isSelected: controller.gameDifficulty == GameDifficulty.hard,
-                onTap: () {
-                  controller.setGameDifficulty(GameDifficulty.hard);
-                  controller.update();
-                  Navigator.pop(context);
-                },
-              ),
+              _difficultyRow(context, 'HARD', Colors.red, controller.gameDifficulty == GameDifficulty.hard, () {
+                controller.setGameDifficulty(GameDifficulty.hard);
+                controller.update();
+                Navigator.pop(context);
+              }),
               const SizedBox(height: 20),
             ],
           ),
@@ -186,12 +167,12 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _difficultyRow(
-    BuildContext context, {
-    required String label,
-    required Color color,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
+    BuildContext context,
+    String label,
+    Color color,
+    bool isSelected,
+    VoidCallback onTap,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
