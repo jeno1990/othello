@@ -41,9 +41,14 @@ class _ValidMoveIndicatorState extends State<ValidMoveIndicator>
   @override
   Widget build(BuildContext context) {
     // Stack a fading circle behind a solid dot if you like, or just show one circle.
-    return SizedBox(
-      width: 20,
-      height: 20,
+    return Container(
+      width: 23,
+      height: 23,
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.black45),
+      ),
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
@@ -54,7 +59,7 @@ class _ValidMoveIndicatorState extends State<ValidMoveIndicator>
               child: Container(
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Color(0xffFFFF00),
+                  color: Colors.black87,
                 ),
               ),
             ),

@@ -42,6 +42,13 @@ class _GamePageState extends State<GamePage> {
     userController = Get.find<UserProfileController>();
     gameStateController = Get.find<GameStateController>();
     board = Board();
+    if (gameStateController.gameDifficulty == GameDifficulty.Easy) {
+      ai = RandomAI(board: board);
+    } else if (gameStateController.gameDifficulty == GameDifficulty.Medium) {
+      ai = GreedyAI(board: board);
+    } else {
+      ai = GreedyAI(board: board);
+    }
     // ai = RandomAI(board: board);
     ai = GreedyAI(board: board);
     _audioPlayer = Get.find<AudioPlayer>();
