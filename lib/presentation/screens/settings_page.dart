@@ -70,11 +70,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 30),
 
-                _buildToggleTile('Show Moves', showMoves, (val) {
-                  setState(() {
-                    showMoves = val;
-                  });
-                }),
+                GetBuilder<GameStateController>(
+                  builder: (gameController) {
+                    return _buildToggleTile(
+                      'Show Moves',
+                      gameController.showMoves,
+                      (val) {
+                        gameController.setShowMoves();
+                      },
+                    );
+                  },
+                ),
                 const SizedBox(height: 16),
 
                 GetBuilder<GameSoundContoller>(

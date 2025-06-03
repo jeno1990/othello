@@ -16,6 +16,7 @@ import 'package:othello/presentation/screens/settings_page.dart';
 import 'package:othello/presentation/widgets/board_boarder_radius.dart';
 import 'package:othello/presentation/widgets/count_dashboard.dart';
 import 'package:othello/presentation/widgets/menu_tab.dart';
+import 'package:othello/presentation/widgets/move_indicator.dart';
 import 'package:othello/utils/constants.dart';
 
 class GamePage extends StatefulWidget {
@@ -28,6 +29,7 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   late final UserProfileController userController;
+  late final GameStateController gameStateController;
   late final AudioPlayer _audioPlayer;
   late final Board board;
   int currentTurn = ITEM_BLACK;
@@ -38,6 +40,7 @@ class _GamePageState extends State<GamePage> {
   @override
   void initState() {
     userController = Get.find<UserProfileController>();
+    gameStateController = Get.find<GameStateController>();
     board = Board();
     // ai = RandomAI(board: board);
     ai = GreedyAI(board: board);
@@ -107,9 +110,19 @@ class _GamePageState extends State<GamePage> {
                       title: 'Pass',
                       onTap: () {
                         setState(() {
-                          currentTurn = ITEM_WHITE;
+                          if (currentTurn == ITEM_BLACK) {
+                            currentTurn = ITEM_WHITE;
+                          } else {
+                            currentTurn = ITEM_BLACK;
+                          }
+                          clearMoves();
+                          if (!widget.isWithBot || currentTurn == ITEM_BLACK) {
+                            List<Coordinate> availableMoves = board
+                                .getAllValidMoves(currentTurn);
+                            buildValidMoves(availableMoves);
+                          }
                         });
-                        playBotMove();
+                        if (widget.isWithBot) playBotMove();
                       },
                     ),
                   ],
@@ -119,9 +132,9 @@ class _GamePageState extends State<GamePage> {
               CountDashboard(
                 count: countItemWhite,
                 difficulty: Get.find<GameStateController>().gameDifficulty,
-                isPlayer1: !widget.isWithBot,
+                isPlayer1: false,
                 isBot: widget.isWithBot,
-                name: 'Player 1',
+                name: 'Player 2',
                 currentTurn: currentTurn == ITEM_WHITE,
               ),
 
@@ -151,14 +164,13 @@ class _GamePageState extends State<GamePage> {
               CountDashboard(
                 count: countItemBlack,
                 difficulty: Get.find<GameStateController>().gameDifficulty,
-                isPlayer1: widget.isWithBot,
+                isPlayer1: true,
                 isBot: false,
                 name:
-                    widget.isWithBot
-                        ? (userController.usernameValue != ''
-                            ? userController.usernameValue
-                            : 'Player 1')
-                        : 'Player 2',
+                    widget.isWithBot && userController.usernameValue != ''
+                        ? userController.usernameValue
+                        : 'Player 1',
+
                 currentTurn: currentTurn == ITEM_BLACK,
               ),
 
@@ -186,9 +198,7 @@ class _GamePageState extends State<GamePage> {
   Widget buildBlockUnit(int row, int col) {
     return GestureDetector(
       onTap: () async {
-        // setState(() {
-        //   pasteItemToTable(row, col, currentTurn);
-        // });
+        print('$currentTurn is current turn');
         final soundController = Get.find<GameSoundContoller>();
         if (soundController.isSoundEffectsOn) {
           await _audioPlayer.setSource(AssetSource('audio/click_sound_1.mp3'));
@@ -237,17 +247,7 @@ class _GamePageState extends State<GamePage> {
         decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
       );
     } else if (block.value == ITEM_VALID_MOVE) {
-      return Container(
-        width: 30,
-        height: 30,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          image: DecorationImage(
-            image: AssetImage('assets/image/gif.webp'),
-            fit: BoxFit.cover,
-          ),
-        ),
-      );
+      return ValidMoveIndicator();
     }
     return Container();
   }
@@ -286,6 +286,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   void buildValidMoves(List<Coordinate> list) {
+    if (!gameStateController.showMoves) return;
     List<List<BlockUnit>> table = board.getTable();
     for (Coordinate c in list) {
       table[c.row][c.col].value = ITEM_VALID_MOVE;

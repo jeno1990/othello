@@ -28,7 +28,7 @@ class CountDashboard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors:
-              currentTurn
+              !currentTurn
                   ? [
                     const Color.fromARGB(255, 67, 66, 66),
                     Color.fromARGB(255, 135, 133, 133),
