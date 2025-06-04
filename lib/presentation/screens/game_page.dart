@@ -17,6 +17,7 @@ import 'package:othello/presentation/widgets/board_boarder_radius.dart';
 import 'package:othello/presentation/widgets/count_dashboard.dart';
 import 'package:othello/presentation/widgets/menu_tab.dart';
 import 'package:othello/presentation/widgets/move_indicator.dart';
+import 'package:othello/presentation/widgets/winner_pop.dart';
 import 'package:othello/utils/constants.dart';
 
 class GamePage extends StatefulWidget {
@@ -177,7 +178,24 @@ class _GamePageState extends State<GamePage> {
                           _playBotMove();
                         }
                         if (boardController.isGameOver) {
-                          _showGameOverDialog();
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (BuildContext context) {
+                              return WinnerPopup(
+                                blackCount: boardController.countItemBlack,
+                                whiteCount: boardController.countItemWhite,
+                                onRestart: () {
+                                  boardController.restart();
+                                  final available = boardController.board
+                                      .getAllValidMoves(
+                                        boardController.currentTurn,
+                                      );
+                                  boardController.buildValidMoves(available);
+                                },
+                              );
+                            },
+                          );
                           return;
                         }
                       },
@@ -288,7 +306,23 @@ class _GamePageState extends State<GamePage> {
         if (moved) {
           // check if game is over
           if (boardController.isGameOver) {
-            _showGameOverDialog();
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return WinnerPopup(
+                  blackCount: boardController.countItemBlack,
+                  whiteCount: boardController.countItemWhite,
+                  onRestart: () {
+                    boardController.restart();
+                    final available = boardController.board.getAllValidMoves(
+                      boardController.currentTurn,
+                    );
+                    boardController.buildValidMoves(available);
+                  },
+                );
+              },
+            );
             return;
           }
           if (widget.isWithBot && boardController.currentTurn == ITEM_WHITE) {
@@ -352,7 +386,23 @@ class _GamePageState extends State<GamePage> {
       if (move != null) {
         boardController.pasteItemToTable(move.row, move.col, ITEM_WHITE);
         if (boardController.isGameOver) {
-          _showGameOverDialog();
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return WinnerPopup(
+                blackCount: boardController.countItemBlack,
+                whiteCount: boardController.countItemWhite,
+                onRestart: () {
+                  boardController.restart();
+                  final available = boardController.board.getAllValidMoves(
+                    boardController.currentTurn,
+                  );
+                  boardController.buildValidMoves(available);
+                },
+              );
+            },
+          );
           return;
         }
       }
@@ -362,63 +412,5 @@ class _GamePageState extends State<GamePage> {
       );
       boardController.buildValidMoves(available);
     });
-  }
-
-  void _showGameOverDialog() {
-    final blackCount = boardController.countItemBlack;
-    final whiteCount = boardController.countItemWhite;
-
-    String resultText;
-    if (blackCount > whiteCount) {
-      resultText = 'Black wins!';
-    } else if (whiteCount > blackCount) {
-      resultText = 'White wins!';
-    } else {
-      resultText = 'It\'s a tie!';
-    }
-
-    Get.defaultDialog(
-      title: 'Game Over',
-      titleStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Final Score',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Black: $blackCount    White: $whiteCount',
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            resultText,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-      barrierDismissible: false,
-      // “Play Again” button
-      confirm: ElevatedButton(
-        onPressed: () {
-          boardController.restart();
-          final available = boardController.board.getAllValidMoves(
-            boardController.currentTurn,
-          );
-          boardController.buildValidMoves(available);
-          Get.back();
-        },
-        child: const Text('Play Again'),
-      ),
-      cancel: ElevatedButton(
-        onPressed: () {
-          Get.back();
-          Get.back();
-        },
-        child: const Text('Home'),
-      ),
-    );
   }
 }
