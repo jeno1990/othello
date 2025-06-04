@@ -209,4 +209,37 @@ class Board {
     }
     return (countItemBlack, countItemWhite);
   }
+
+  Board clone() {
+    Board newBoard = Board();
+    for (int r = 0; r < 8; r++) {
+      for (int c = 0; c < 8; c++) {
+        newBoard.table[r][c].value = table[r][c].value;
+      }
+    }
+    return newBoard;
+  }
+
+  void applyMove(Coordinate move, int player) {
+    int row = move.row;
+    int col = move.col;
+
+    // Gather all discs to flip in each direction
+    List<Coordinate> toFlip = [];
+    toFlip.addAll(checkRight(row, col, player));
+    toFlip.addAll(checkLeft(row, col, player));
+    toFlip.addAll(checkDown(row, col, player));
+    toFlip.addAll(checkUp(row, col, player));
+    toFlip.addAll(checkUpLeft(row, col, player));
+    toFlip.addAll(checkUpRight(row, col, player));
+    toFlip.addAll(checkDownLeft(row, col, player));
+    toFlip.addAll(checkDownRight(row, col, player));
+
+    table[row][col].value = player;
+
+    // Flip all opponent discs
+    for (Coordinate coord in toFlip) {
+      table[coord.row][coord.col].value = player;
+    }
+  }
 }
