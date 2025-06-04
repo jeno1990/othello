@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:othello/ai/base_ai.dart';
 import 'package:othello/ai/greedy_ai.dart';
+import 'package:othello/ai/minmax_ai.dart';
 import 'package:othello/ai/random_ai.dart';
 import 'package:othello/controllers/board_controller.dart';
 import 'package:othello/controllers/game_state_controller.dart';
@@ -47,8 +47,10 @@ class _GamePageState extends State<GamePage> {
 
     if (gameStateController.gameDifficulty == GameDifficulty.Easy) {
       ai = RandomAI(board: boardController.board);
-    } else {
+    } else if (gameStateController.gameDifficulty == GameDifficulty.Medium) {
       ai = GreedyAI(board: boardController.board);
+    } else {
+      ai = HardAI(board: boardController.board);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       boardController.clearMoves();
